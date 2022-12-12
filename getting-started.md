@@ -1,121 +1,83 @@
 +++
-title = "Getting started"
+title = "Getting started with Julia"
 +++
 
-# Getting started
-
-This page contains some detailed instructions on creating your own website with Julia tutorials.
-If you are more familiar with Julia development and GitHub Actions and Pages, then see the [Homepage](/) for more generic instructions.
+# Getting started with Julia
 
 \toc
 
-## Create a new repository based on this template
+## How to install Julia
 
-Before diving into details, a bit of background about the build system:
-GitHub provides computers for free to run your code or, specifically, tutorials **and** they host websites for free.
-This running for free is called continuous integration (CI) and is very useful in practice.
-In essence, the idea is that a computer starts running your code each time that you change your code/tutorials in a repository.
-Because GitHub shows very clearly which runs belong to which code change, it is very easy to see what caused runs to fail if a mistake was made when updating a tutorial.
-Also, CI contains the whole build pipeline from [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks to deploying the website.
-This makes it easy to make a minor change, say, to fix a typo.
-Instead of manually having to run the tutorial after fixing the typo and upload the changed files to a website, the idea is to just fix the typo and let CI do the rest.
-The CI will automatically re-run any notebooks that it needs to run and update the website.
+### Juliaup
 
-So, to have your own tutorials and CI and website, a new repository has to be created based on this template.
-To do so, go to <https://github.com/rikhuijzer/JuliaTutorialsTemplate> and click on the big "Use this template" button.
-In the new page that opens, give your project a nice name click on "Create repository from template".
-Do not select "Include all branches".
-Next, GitHub will say "Generating your repository" for a few seconds and then you have your new repository 🎉.
+Julia installation is becoming extremely simple. Whether you work in Windows, Linux, or MacOS, the first step is to install [juliaup](https://github.com/JuliaLang/juliaup) (the fine details change by OS).
 
-## Check that GitHub Actions are running
-
-That CI thing mentioned above is called GitHub Actions.
-When clicking on the Actions tab near the top of the page, there should be one workflow run visible.
-It should either be orange, which means running, or green, which means successfully finished.
-If this is the case, then you're ready to go to the next step 🎈.
-Otherwise, enable the GitHub Actions in the repository settings or open an issue at <https://github.com/rikhuijzer/JuliaTutorialsTemplate/issues/new>.
-
-## Enable the website
-
-To setup the website go to your Pages settings inside your repository's settings.
-This should show "Your site is ready to be published at [...]".
-To publish the site, set the Source to `gh-pages` and click Save.
-After a few minutes, your site should be visible at the link shown after "Your site is ready to be published at".
-So, that's probably something like "https://YourName.github.io/YourProject" 🌐.
-If you want, you can add this link to the About section on the homepage of your GitHub repository so that you and visitors can quickly find the site from there.
-
-## Make the website your own
-
-Now that all automation is configured, you can change the files in the repository and the site should update once the run completes.
-There are now two ways to go about changing the website:
-
-### Without running the site locally
-
-Just create some new Pluto notebooks and store them in the `tutorials` directory.
-Note that the page title is set in the first blocks looking like:
-
-```
-# hideall
-title = "My title";
+For apples:
+```sh
+brew install juliaup
 ```
 
-```
-"""
-+++
-title = "$title"
-+++
-""" |> Base.Text
+For Linux users, on Arch, with `paru`:
+```sh
+paru juliaup
 ```
 
-Add these blocks in your website to let Franklin know what the page title should be.
-Also remove the old tutorials while you are in that folder.
-
-Next, search for `JuliaTutorialsTemplate` inside your repository and replace all occurrences of that word by the name of your repository.
-It is especially important to set the right `prepath` in `config.md` since otherwise the CSS will not work on the website.
-
-Also, go to the menu in `_layout/menu.html` and find the lines containing "menu-header" and "menu-item".
-Compare these lines with how the website looks and, next, change the lines to point to your own tutorials.
-You can also decide to remove all "menu-header" entries; it depends on personal preference.
-
-After doing this, your tutorials should become available on your website 🔎.
-This approach should work fine in most cases 🧑‍💻.
-If there are problems, it may be good to run the site locally to see what's wrong.
-
-### With running the site locally
-
-If you rather double check whether things work locally, there are two things to do:
-
-First, run the following:
-
-```julia-repl
-julia> ]
-
-pkg> activate .
-
-(Tutorials) pkg> instantiate
-
-(Tutorials) pkg> # Press backspace to go back
-
-julia> using Tutorials
-
-julia> build_tutorials()
-[...]
+For Windows:
+```sh
+winget install julia -s msstore
 ```
 
-This should run all the tutorials in the `tutorials` folder and write multiple Markdown files to the `tutorials` folder.
-Now that the files can be read by [Franklin.jl](https://github.com/tlienart/Franklin.jl), it's time to start the Live Server.
-To do so, continue from the last code with:
+### Julia
 
-```julia-repl
-julia> using Franklin
+Once we have Juliaup, the next step is the same for everyone:
 
-julia> serve()
-[...]
-→ Starting the server...
-✓ LiveServer listening on http://localhost:8000/ ...
-  (use CTRL+C to shut down)
-→ page updated [✓]
+```sh
+juliaup add release
 ```
 
-Go to that URL (`http://localhost:8000/`) in your browser to see a preview of the tutorials.
+## Choose an IDE
 
+There's a variety of good IDEs to work with Julia. You may have them already. Some don't even need a separate installation.
+
+The choice depends on personal taste, fashion trends, whether you mostly work locally or on a server, your mood, and the weather.
+
+Options include:
+
+- Code ([Visual Studio](https://code.visualstudio.com/) or its open source alternative [Codium](https://vscodium.com/))
+- Vim / Neovim / LunarVim / Neovide, ...
+- Emacs, ...
+- [Jupyter](https://jupyter.org/) / JupyterLab
+- [Pluto](https://github.com/fonsp/Pluto.jl) (this one is actually a package within Julia)
+
+In the tutorial I'm probably going to show you Code and Pluto.
+
+There's also the options of working directly from the REPL, and the Julia Package [`OhMyREPL`](https://kristofferc.github.io/OhMyREPL.jl/latest/) makes that experience much nicer.
+
+## using
+
+Julia syntax is similar to that of `Matlab`, indexing of arrays (by default) starts at 1, to load libraries you call them as `using LibraryName`.
+
+## Work in Environments
+
+Always, always, always, work in a project-dedicated environment. Working in environments is
+
+1. EASY
+2. REPRODUCIBLE
+
+EASY: all it takes is having the following three lines at the start of your scripts
+
+```julia
+using Pkg
+Pkg.activate(".") # where . is the project directory
+Pkg.instantiate() # installs required packages, at the right version
+```
+
+REPRODUCIBLE: that is given by Julia automagically creating two important files for every environment, `Manifest.toml` and `Project.toml`. They contain detailed information about every package you installed in certain environment, their version, their dependencies, ...
+
+More details in the official [Pkg documentation](https://pkgdocs.julialang.org/v1/environments/).
+
+(we are going to look at this together)
+
+## SysImages
+
+Loading libraries may take some time. This is due to the fact that the code in Julia is Just-In-Time compiled, and that requires some extra work. Similarly, the *Time-to-first-plot* can be perceveid as high: the first time you call a function, say `plot(x,y)`, that *method* (function applied to certain types) is going to be compiled: this ensure that the second time you call the same method, its execution is going to be much faster (like, really, much faster, C like fast). More details [here](https://julialang.org/blog/2021/01/precompile_tutorial/). This *can* be mitigated  (if you perceive that as a bottleneck in your workflow). The trick is to use the library [`PackageCompiler`](https://julialang.github.io/PackageCompiler.jl/stable/), and we are going to show you an example together.
