@@ -1,3 +1,4 @@
-# JuliaTutorialsTemplate
+# Julia Tutorial
+## AusDM 2022
 
-See <http://rikhuijzer.github.io/JuliaTutorialsTemplate/> for more information.
+Material for the 2022 AusDM tutorial, run by Giulio Valentino Dalla Riva and Thomas Li.

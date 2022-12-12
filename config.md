@@ -8,12 +8,12 @@ mintoclevel = 2
 # Base files such as LICENSE.md and README.md are ignored by default.
 ignore = ["node_modules/"]
 
-prepath = "JuliaTutorialsTemplate"
+prepath = "2022_AusDM"
 
 # RSS (the website_{title, descr, url} must be defined to get RSS)
 generate_rss = false
-website_title = "JuliaTutorialsTemplate"
-website_descr = "Example website containing Julia tutorials"
-website_url   = "https://rikhuijzer.github.io/JuliaTutorialsTemplate/"
+website_title = "Aus_DM 2022: Julia Tutorial"
+website_descr = "Material for the "
+website_url   = "https://gvdr.github.io/2022_AusDM/"
 +++
 
