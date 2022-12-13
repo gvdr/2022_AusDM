@@ -10,6 +10,25 @@ using Lux, DiffEqFlux, DifferentialEquations, Optimization, OptimizationOptimJL,
 # ╔═╡ 27c14067-8004-4636-abfa-9a93f7791e95
 using SymbolicRegression, SymbolicUtils
 
+# ╔═╡ da1222ac-f455-4a13-82e0-2e452da39324
+md"""
+# Going Neural
+
+In this part of the tutorial we'll see how the DifferentialEquations ecosystems can be interfaced with the Lux (and Flux) Deep Learning capabilities.
+
+We will train Neural Networks to approximate a dynamical system (the same we defined in the previous Pluto).
+"""
+
+# ╔═╡ 989df931-bbfa-42ad-9f84-788f3c279400
+md"We start by loading the necessary libraries"
+
+# ╔═╡ 040d1d1f-a4bc-4438-886c-44725a925dab
+md"""
+## Simulate Data
+
+We create some data for our analysis, setting up an ODE system. For the details of what's happening here
+"""
+
 # ╔═╡ 30aa657a-eb53-4fb2-9b7f-adbc2d8fa20c
 begin
 	rng = Random.default_rng()
@@ -33,6 +52,13 @@ begin
 	true_data = Array(solve(prob_cat, Tsit5(), saveat = tsteps))
 end
 
+# ╔═╡ e3a23a96-b0d1-4fd4-a442-cff7888e6c80
+md"""
+## Define the Neural Network
+
+Lux is a lot similar to Flux, but with a different philosophy in how to handle the model (network) parameters, which makes it conveniente for our scenario. The network will take 
+"""
+
 # ╔═╡ 43630f71-4cc3-42e2-9a17-aea1d4612458
 dudtₙₙ = Lux.Chain(
 	x -> x.^3,
@@ -44,20 +70,49 @@ dudtₙₙ = Lux.Chain(
 # ╔═╡ a69389be-98b9-4470-8879-50ffca1ac215
 pₙₙ, strₙₙ = Lux.setup(rng, dudtₙₙ)
 
+# ╔═╡ ffc07731-b2e7-44b8-8611-a4882a93bcff
+md"""
+We build a neural ordinary differential equation, the gradient is calculated via adjoints. 
+"""
+
 # ╔═╡ 37027c53-7fae-4750-9661-43aa41b8a2ae
 prob_neuralode = NeuralODE(dudtₙₙ, tspan, Tsit5(), saveat = tsteps)
+
+# ╔═╡ 84515887-61c9-4c41-af64-d43553734ca5
+md"""
+Next, we build a prediction function that takes the initial values of the system, and the network information (parameters and structure).
+"""
 
 # ╔═╡ bc82256f-e9ca-4c6d-80f4-00fe2349758d
 function predict_neuralode(p)
   Array(prob_neuralode(u₀, p, strₙₙ)[1])
 end
 
+# ╔═╡ 32e83571-5fdb-4fd3-9fa1-abc854a337f1
+md"""
+## Define the loss function
+
+The key step is now to define a loss function. The parameters of the network will be optimized to minimise the loss. The function needs to take two inputs: network params and hyperparameters (that we don't actually use in our case).
+
+There's various way to do it, but we'll use Julia multiple dispatch defining a method for one argument, and another for two arguments.
+"""
+
 # ╔═╡ c0105f6a-12b3-4155-9602-ffc2f177fab1
-function loss_neuralode(p)
-    pred = predict_neuralode(p)
+function loss_neuralode(network_params)
+    pred = predict_neuralode(network_params)
     loss = sum(abs2, true_data .- pred)
     return loss, pred
 end
+
+# ╔═╡ 8210321d-ad13-4845-a35e-49b66ffe082b
+loss_neuralode(p,hyper_p) = loss_neuralode(p)
+
+# ╔═╡ 0c3c85ed-8160-4bb7-821a-cc8ef2a294e3
+md"""
+## Train to Results
+
+We're mostly done, now it's time to traing the network on the synthetic data we produced, plot and enjoy.
+"""
 
 # ╔═╡ f4a01de9-1afb-4b09-8650-64b758add295
 function plot_solutions(true_data, prediction)
@@ -77,20 +132,37 @@ callback = function (p, l, pred; doplot = false)
   return false
 end
 
+# ╔═╡ 108865d7-add1-4046-a661-7ffd86eb1f20
+md"""
+At the beginning the random initialization of the Neural Network does a very bad job, as we would expect!
+"""
+
 # ╔═╡ abe3b7e8-b15b-4565-a0f7-68408c392429
 pinit = Lux.ComponentArray(pₙₙ)
 
 # ╔═╡ a8a74a75-4bd9-4176-b566-6356ddc53bc1
 callback(pinit, loss_neuralode(pinit)...; doplot=true)
 
+# ╔═╡ 26c558ac-212a-4929-b3fc-6405bb3c8b1e
+md"""
+We use Zygote.jl for handling Automatic Differentiation (reverse-mode AD), and Optimization.jl to define a representation of an optimization of an objective function f, defined by:
+
+$$\min_{u} f(u,p)$$
+"""
+
 # ╔═╡ b1f00eb3-0add-40fc-ae44-2765dfe32400
 adtype = Optimization.AutoZygote()
 
 # ╔═╡ b9eab0bc-babd-4869-8fa0-6cab978c7216
-optf = OptimizationFunction((x, p) -> loss_neuralode(x), adtype)
+optf = OptimizationFunction(loss_neuralode, adtype)
 
 # ╔═╡ 305f2f96-b2a0-4bdd-aa68-5d5e43289fd5
 optprob = Optimization.OptimizationProblem(optf, pinit)
+
+# ╔═╡ 9c2d2f1b-6470-4fa3-96dd-8372548e56c4
+md"""
+And we train! Once with ADAM.
+"""
 
 # ╔═╡ e665eabf-1c79-4c2f-85e3-a071d7c23ed2
 result_neuralode = Optimization.solve(optprob,
@@ -104,6 +176,11 @@ callback(result_neuralode.u, loss_neuralode(result_neuralode.u)...; doplot=true)
 # ╔═╡ ecf3473e-a087-4187-af83-77ea4b2758eb
 optprob2 = remake(optprob,u0 = result_neuralode.u)
 
+# ╔═╡ 607114c5-5be2-440d-afd3-a66d3562e0dd
+md"""
+And once with BFGS (quasi-Newton method that updates an approximation to the Hessian using past approximations as well as the gradient).
+"""
+
 # ╔═╡ 51954aaf-37c1-405a-86e1-b8a5e0c2fe70
 result_neuralode2 = Optimization.solve(optprob2,
                                         Optim.BFGS(initial_stepnorm=0.01),
@@ -112,6 +189,13 @@ result_neuralode2 = Optimization.solve(optprob2,
 
 # ╔═╡ 4421d2b9-d259-45e3-91ce-16c86ccf986b
 callback(result_neuralode2.u, loss_neuralode(result_neuralode2.u)...; doplot=true)
+
+# ╔═╡ 23f707a7-3289-457a-aded-a2bd5b33ce87
+md"""
+## Bonus: going Symbolic
+
+Finally, if we are not satisfied of staying with a not much interpretable Neural Network, we can use something like SymbolicRegression to recover two functions closely approximating the behaviour of the NN.
+"""
 
 # ╔═╡ 57e2cbb2-3d8e-4b5b-be8e-3b1f097c5fd0
 #result_neuralode2.u
@@ -138,24 +222,6 @@ hall_of_fame = EquationSearch(
 	options=Search_options,
     parallelism=:multithreading
 )
-
-# ╔═╡ ebd7f05b-e80f-42d6-a726-f418169ac972
-hall_of_fame[1]
-
-# ╔═╡ 4cd7b838-e115-4f5f-9358-a406cee5ec0f
-dominating1 = calculate_pareto_frontier(X_inputs, y_outputs[1,:], hall_of_fame[1], Search_options);
-
-# ╔═╡ 2d96d7d3-26b5-4254-a0a9-52e17b2a0cce
-dominating2 = calculate_pareto_frontier(X_inputs, y_outputs[2,:], hall_of_fame[2], Search_options)
-
-# ╔═╡ 4e98f8e2-1e4d-4067-bcac-9b742b773ad4
-println(simplify(node_to_symbolic(dominating2[2].tree, Search_options)))
-
-# ╔═╡ 0e995210-bf4a-4767-a678-27b95a2ec285
-println(simplify(node_to_symbolic(dominating1[2].tree, Search_options)))
-
-# ╔═╡ 8f7623d2-1d0b-451b-aebd-ab45500e9483
-
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -187,7 +253,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.3"
 manifest_format = "2.0"
-project_hash = "e93c0b9119fe770e6b237434904d11bec5097673"
+project_hash = "ac8b470644c96f6fdb36cee2f98328b2a953f0cf"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
@@ -882,9 +948,9 @@ version = "0.21.0+0"
 
 [[deps.Glib_jll]]
 deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libiconv_jll", "Libmount_jll", "PCRE2_jll", "Pkg", "Zlib_jll"]
-git-tree-sha1 = "fb83fbe02fe57f2c068013aa94bcdf6760d3a7a7"
+git-tree-sha1 = "d3b3624125c1474292d0d8ed0f65554ac37ddb23"
 uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
-version = "2.74.0+1"
+version = "2.74.0+2"
 
 [[deps.Graphite2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1202,9 +1268,9 @@ version = "1.42.0+0"
 
 [[deps.Libiconv_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "42b62845d70a619f063a7da093d995ec8e15e778"
+git-tree-sha1 = "c7cb1f5d892775ba13767a87c7ada0b980ea0a71"
 uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
-version = "1.16.1+1"
+version = "1.16.1+2"
 
 [[deps.Libmount_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2405,38 +2471,46 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─da1222ac-f455-4a13-82e0-2e452da39324
+# ╟─989df931-bbfa-42ad-9f84-788f3c279400
 # ╠═9ce8068e-7679-11ed-3ac9-054d38c92e23
+# ╟─040d1d1f-a4bc-4438-886c-44725a925dab
 # ╠═30aa657a-eb53-4fb2-9b7f-adbc2d8fa20c
 # ╠═ca65f138-ba92-48b5-99a1-47bd3f201a11
 # ╠═3888770d-ed4e-465d-8062-0bbbb2cbf129
+# ╟─e3a23a96-b0d1-4fd4-a442-cff7888e6c80
 # ╠═43630f71-4cc3-42e2-9a17-aea1d4612458
 # ╠═a69389be-98b9-4470-8879-50ffca1ac215
+# ╟─ffc07731-b2e7-44b8-8611-a4882a93bcff
 # ╠═37027c53-7fae-4750-9661-43aa41b8a2ae
+# ╟─84515887-61c9-4c41-af64-d43553734ca5
 # ╠═bc82256f-e9ca-4c6d-80f4-00fe2349758d
+# ╟─32e83571-5fdb-4fd3-9fa1-abc854a337f1
 # ╠═c0105f6a-12b3-4155-9602-ffc2f177fab1
+# ╠═8210321d-ad13-4845-a35e-49b66ffe082b
+# ╟─0c3c85ed-8160-4bb7-821a-cc8ef2a294e3
 # ╠═f4a01de9-1afb-4b09-8650-64b758add295
 # ╠═40673eac-eb0f-46f6-8767-3a52756c2bb3
+# ╟─108865d7-add1-4046-a661-7ffd86eb1f20
 # ╠═abe3b7e8-b15b-4565-a0f7-68408c392429
 # ╠═a8a74a75-4bd9-4176-b566-6356ddc53bc1
+# ╟─26c558ac-212a-4929-b3fc-6405bb3c8b1e
 # ╠═b1f00eb3-0add-40fc-ae44-2765dfe32400
 # ╠═b9eab0bc-babd-4869-8fa0-6cab978c7216
 # ╠═305f2f96-b2a0-4bdd-aa68-5d5e43289fd5
+# ╟─9c2d2f1b-6470-4fa3-96dd-8372548e56c4
 # ╠═e665eabf-1c79-4c2f-85e3-a071d7c23ed2
 # ╠═8bbdb521-afb5-4fe3-94d3-82601d8220f6
 # ╠═ecf3473e-a087-4187-af83-77ea4b2758eb
+# ╟─607114c5-5be2-440d-afd3-a66d3562e0dd
 # ╠═51954aaf-37c1-405a-86e1-b8a5e0c2fe70
 # ╠═4421d2b9-d259-45e3-91ce-16c86ccf986b
+# ╟─23f707a7-3289-457a-aded-a2bd5b33ce87
 # ╠═27c14067-8004-4636-abfa-9a93f7791e95
 # ╠═57e2cbb2-3d8e-4b5b-be8e-3b1f097c5fd0
 # ╠═cff5c3a0-0b72-4c27-a36c-1f395bdc11e8
 # ╠═5d982270-57e0-44a9-a385-363ad9686302
 # ╠═78567613-e8a8-4c42-b2d7-eac2dedeb1e1
 # ╠═2061398c-bc74-4ffa-830e-a8f89cae2f1c
-# ╠═ebd7f05b-e80f-42d6-a726-f418169ac972
-# ╠═4cd7b838-e115-4f5f-9358-a406cee5ec0f
-# ╠═2d96d7d3-26b5-4254-a0a9-52e17b2a0cce
-# ╠═4e98f8e2-1e4d-4067-bcac-9b742b773ad4
-# ╠═0e995210-bf4a-4767-a678-27b95a2ec285
-# ╠═8f7623d2-1d0b-451b-aebd-ab45500e9483
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
