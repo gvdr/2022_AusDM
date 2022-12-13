@@ -21,6 +21,23 @@ using DifferentialEquations
 # ╔═╡ 7aaa1f1a-7a67-4b9d-bd46-54c5eae9970a
 using Statistics, ComponentArrays, Random
 
+# ╔═╡ 261cd825-d5c9-43bb-8aa2-36fdd0f284ac
+md"""
+# Universal Differential Equations
+
+And finally the part of the tutorial I prefer! Universal Differential Equations are a smart generalization of Neural Differential Equation. Now, the right handside of the equations defining the system can be a combination of explicit functions (capturing the *known* part of the system, the domain knowledge we can gather) and Neural Networks (capturing the *unknown* elements of the system).
+"""
+
+# ╔═╡ 54844631-24aa-40dd-a79c-1051b5ecc642
+md"""
+As always, we start by loading the libraries we'll need. There a bunch of them this time :-)
+"""
+
+# ╔═╡ 4b190bd4-6982-4fd7-bec3-ccf549c59271
+md"""
+## Define the dynamical system
+"""
+
 # ╔═╡ 4ec37a50-07e0-4d5c-8bb2-7faafec5c2cb
 begin
 	u₀ = 🐱₀, 😄₀ = [-1.0, 1.0]
@@ -35,7 +52,7 @@ begin
 	end
 
 	prob = ODEProblem(cat_love, u₀,tspan, p_true)
-	solution = solve(prob, Vern7(), abstol=1e-12, reltol=1e-12, saveat = 0.1)
+	solution = solve(prob, Vern7(), abstol=1e-12, reltol=1e-12, saveat = 0.3)
 
 	X = Array(solution)
 	t = solution.t
@@ -60,6 +77,11 @@ DX = Array(solution(solution.t, Val{1}))
 # ╔═╡ e3534268-9656-465f-a09d-bf39ff7f7537
 full_problem = DataDrivenProblem(X, t = t, DX = DX)
 
+# ╔═╡ 9c6b5de5-9393-475c-9358-b9471541bb38
+md"""
+## Define the neural network
+"""
+
 # ╔═╡ b10cadb8-dfdb-40f1-8c73-a6d98ff7cef8
 begin
 	rng = Random.default_rng()
@@ -80,6 +102,13 @@ begin
 
 end
 
+# ╔═╡ 0d0bb631-ad2e-41eb-b23c-32e1f2eba77f
+md"""
+## Universal Differential Equation
+
+Here we pretend we know that the system is linked by d🐱 depending on 😄 multiplicatively, and d😄 depending on 🐱 also multiplicatively.
+"""
+
 # ╔═╡ d64b4951-73ce-42cf-825d-eb999daab3a4
 # Define the hybrid model
 function ude_cat!(du, u, p, t) #, p_true)
@@ -91,6 +120,11 @@ end
 # ╔═╡ 01940f06-7cb5-47db-a20e-ab54a8feb424
 #  ODEProblem{ Is In Place? , Specialize? } -> ? ODEFunction
 prob_nn = ODEProblem{true, SciMLBase.FullSpecialize}(ude_cat!,u₀, tspan, pₙₙ)
+
+# ╔═╡ 2c4d078a-89a6-4238-8c7c-6b47572a996a
+md"""
+## And we train!
+"""
 
 # ╔═╡ 55a00ab4-06bf-49ef-b901-004311b9b64d
 function predict(θ, X = u₀, T = t)
@@ -117,7 +151,7 @@ end
 
 # ╔═╡ 7d4206da-23c9-4224-8814-2ff93dfa06cd
 begin
-	res1 = Optimization.solve(optprob, ADAM(0.1), maxiters = 2)
+	res1 = Optimization.solve(optprob, ADAM(0.1), maxiters = 200)
 end
 
 # ╔═╡ 840f485d-3447-4dfe-a1c2-f606627699a9
@@ -134,6 +168,13 @@ begin
 	plot(solution, alpha = 0.75, color = :black, label = ["True Data" nothing])
 	scatter!(ts,X̂',alpha = 0.75, color = :red, label = ["NN Data" nothing])
 end
+
+# ╔═╡ 0dc53e2a-34ba-4d1a-b232-042c56383dde
+md"""
+What a fit eh!
+
+## Equation discovery
+"""
 
 # ╔═╡ e16c7229-72bd-470d-8677-fc9f5864cc49
 begin
@@ -2468,24 +2509,31 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─261cd825-d5c9-43bb-8aa2-36fdd0f284ac
+# ╟─54844631-24aa-40dd-a79c-1051b5ecc642
 # ╠═fe67368c-7699-11ed-37bb-81ff4bccf2bd
 # ╠═d4c9f8d9-0fd1-48a6-b41a-ae41571ddeab
 # ╠═5294ddaf-fc3e-40d1-affc-559406e2d2f6
 # ╠═7aaa1f1a-7a67-4b9d-bd46-54c5eae9970a
+# ╟─4b190bd4-6982-4fd7-bec3-ccf549c59271
 # ╠═4ec37a50-07e0-4d5c-8bb2-7faafec5c2cb
 # ╠═500e5ce4-828f-413c-9a66-5e06663b2241
 # ╠═a80b0133-7cfe-4c7d-9857-4dffd534a5a1
-# ╠═e3534268-9656-465f-a09d-bf39ff7f7537
 # ╠═e768035e-d706-4871-a368-e373d8ebd3c4
+# ╠═e3534268-9656-465f-a09d-bf39ff7f7537
+# ╠═9c6b5de5-9393-475c-9358-b9471541bb38
 # ╠═b10cadb8-dfdb-40f1-8c73-a6d98ff7cef8
+# ╟─0d0bb631-ad2e-41eb-b23c-32e1f2eba77f
 # ╠═d64b4951-73ce-42cf-825d-eb999daab3a4
 # ╠═01940f06-7cb5-47db-a20e-ab54a8feb424
+# ╟─2c4d078a-89a6-4238-8c7c-6b47572a996a
 # ╠═55a00ab4-06bf-49ef-b901-004311b9b64d
 # ╠═b5574df2-c0eb-4e04-947c-a6e0480bf063
 # ╠═b290b48c-14b1-4e9a-8fac-a58b3314da1d
 # ╠═7d4206da-23c9-4224-8814-2ff93dfa06cd
 # ╠═840f485d-3447-4dfe-a1c2-f606627699a9
 # ╠═07682dfd-2da6-4953-9056-1605a53f6390
+# ╟─0dc53e2a-34ba-4d1a-b232-042c56383dde
 # ╠═e16c7229-72bd-470d-8677-fc9f5864cc49
 # ╠═35e9541e-93f7-4a49-8f36-3318b7767533
 # ╠═cc7a67f7-d21c-4a9e-8b66-ac9a51e527e8
