@@ -26,8 +26,8 @@ We assume that you know how to code, and you are all experts in various areas of
 
 First, we'll touch upon how to [get started with Julia](getting-started) (installation, REPL, IO of data) and then get into some more exciting things (working through different IDEs too!).
 
+1. We begin with a super quick and dirty [intro to writing Julia code](tutorials/00_Fast_Intro)
 1. We start with "simple" [Differential Equations](tutorials/01_Diff_Pluto).
-2. Then, we jump to Neural Network.
-3. And, as we are at it, consider Geometric Deep Learning.
+3. And, as we are at it, consider [Geometric Deep Learning](https://github.com/gvdr/2022_AusDM/tree/main/Graphs).
 4. We move on to combining [Neural Networks and Differential Equations](tutorials/02_neural_ode).
 5. And, hoping to have the time for it, move to [Universal Differential Equations](tutorials/03_ude_sparse).

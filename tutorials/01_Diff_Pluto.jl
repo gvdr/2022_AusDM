@@ -24,11 +24,17 @@ In the following notebook we are going to explore how to define and visualize dy
 
 # ╔═╡ b3573b0d-85d5-4274-8fcf-b812eddda189
 md"""
-# The story of 🐱, 😄 and their love
+# The story of 🐱, 😄 and their troubled love
+
+We are going to talk about two characters: a cat, and a smiley-person.
+
+Being the data people that we are, we'll measure their love (expressed as a real variable `u`) across time (`t`).
+When `u` is positive, there's love. When `u` is negative, well... not so much love.
 """
 
 # ╔═╡ d427a2da-446e-4dcc-9c15-2bef71631718
-# they start by loving each other
+# At the begin of the story, smiley-person really loves his cat.
+# The cat, however, is not impressed.
 🐱₀, 😄₀ = [-1.0, 1.0];
 
 # ╔═╡ f2176b59-4293-4fd9-b6fa-dc5d4867b896
@@ -39,9 +45,11 @@ a, b = [1.0, .5];
 
 # ╔═╡ adb02eed-4def-46f7-885b-2598820bc301
 function cat_love(du,u,p,t)
-	🐱, 😄 = u
-	a, b = p
+	🐱, 😄 = u # the value of love
+	a, b = p # the parameters of the love story
+  # the cat being a cat, runs away from overly affectionate people
 	du[1] = d🐱 = - a*😄
+  # the smiley person love the cat more when the cat is lovely
 	du[2] = d😄 = b*🐱
 end;
 
