@@ -1,0 +1,4 @@
+Sitemap: https://gvdr.github.io/2022_AusDM/sitemap.xml
+
+User-agent: *
+Disallow:

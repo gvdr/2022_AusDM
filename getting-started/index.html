@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/2022_AusDM/assets/favicon.png">
+  <script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ["\\(", "\\)"]],
+      processEscapes: true,
+    }
+  };
+</script>
+
+<!-- This weird alignment is required by Franklin's parser. -->
+<script
+    async
+    src="/2022_AusDM/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js">
+</script>
+
+<style>
+@font-face {
+  src: url("/JuliaTutorialsTemplate//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff">
+}
+</style>
+
+<style>
+@font-face {
+  src: url("/JuliaTutorialsTemplate//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff">
+}
+</style>
+
+<style>
+@font-face {
+  src: url("/JuliaTutorialsTemplate//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff">
+}
+</style>
+
+  <link rel="stylesheet"
+  href="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/styles/github.min.css">
+
+<script
+  src="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/highlight.min.js">
+</script>
+
+<script
+  src="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/languages/julia.min.js">
+</script>
+
+<script
+  src="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/languages/julia-repl.min.js">
+</script>
+
+<script>
+  hljs.configure({tabReplace: '    '});
+  hljs.highlightAll();
+</script>
+
+    <style>
+    @font-face {
+      font-family: JuliaMono-Regular;
+      src: url("/JuliaTutorialsTemplate//assets/JuliaMono/juliamono-0.044/webfonts/JuliaMono-Regular.woff2");
+    }
+    </style>
+
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre.min.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre-exp.min.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre-icons.min.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre-overrides.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/docs.min.css">
+
+  <title>Getting started with Julia - Aus DM 2022: Julia Tutorial</title>
+  <meta name="description" content="A template for building websites with Julia language content. Easily create Pluto notebooks and publish them online.">
+</head>
+<body>
+  <div class="docs-container off-canvas off-canvas-sidebar-show">
+  <div class="docs-navbar">
+    <a class="off-canvas-toggle btn btn-link btn-action" href="#sidebar"><i class="icon icon-menu"></i></a>
+    <div class="btns d-flex">
+      <a class="btn btn-primary ml-1" href="https://github.com/gvdr/2022_AusDM">GitHub</a>
+    </div>
+</div>
+
+<div id="sidebar" class="docs-sidebar off-canvas-sidebar">
+
+<div class="docs-brand">
+    <h5><a href="/2022_AusDM/">Julia 2022 AusDm</a></h5>
+</div>
+
+<div class="docs-nav">
+<div class="accordion-container">
+  <ul class="menu menu-nav">
+    <div class="menu-header">Basic Julia Usage</div>
+    <li class='menu-item active'><a href='/2022_AusDM/getting-started/'>Getting started</a></li>
+    <br/>
+    <div class="menu-header">Julia Goodies</div>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/00_Fast_Intro/'>Very Quick Intro</a></li>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/01_Diff_Pluto/'>Differential Equations</a></li>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/02_neural_ode/'>Neural Differential Equations</a></li>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/03_ude_sparse/'>Universal Differential Equations</a></li>
+  </ul>
+</div>
+</div>
+</div>
+<a class="off-canvas-overlay" href="#close"></a>
+
+
+<div class="off-canvas-content">
+<div id="content" class="docs-content">
+<div class="container">
+<!-- Content appended here -->
+<div class="franklin-content">
+<h1 id="getting_started_with_julia"><a href="#getting_started_with_julia" class="header-anchor">Getting started with Julia</a></h1>
+<div class="franklin-toc"><ol><li><a href="#how_to_install_julia">How to install Julia</a><ol><li><a href="#juliaup">Juliaup</a></li><li><a href="#julia">Julia</a></li></ol></li><li><a href="#choose_an_ide">Choose an IDE</a></li><li><a href="#using">using</a></li><li><a href="#work_in_environments">Work in Environments</a></li><li><a href="#sysimages">SysImages</a></li></ol></div>
+<h2 id="how_to_install_julia"><a href="#how_to_install_julia" class="header-anchor">How to install Julia</a></h2>
+<h3 id="juliaup"><a href="#juliaup" class="header-anchor">Juliaup</a></h3>
+<p>Julia installation is becoming extremely simple. Whether you work in Windows, Linux, or MacOS, the first step is to install <a href="https://github.com/JuliaLang/juliaup">juliaup</a> &#40;the fine details change by OS&#41;.</p>
+<p>For apples:</p>
+<pre><code class="language-sh">brew install juliaup</code></pre>
+<p>For Linux users, on Arch, with <code>paru</code>:</p>
+<pre><code class="language-sh">paru juliaup</code></pre>
+<p>For Windows:</p>
+<pre><code class="language-sh">winget install julia -s msstore</code></pre>
+<h3 id="julia"><a href="#julia" class="header-anchor">Julia</a></h3>
+<p>Once we have Juliaup, the next step is the same for everyone:</p>
+<pre><code class="language-sh">juliaup add release</code></pre>
+<h2 id="choose_an_ide"><a href="#choose_an_ide" class="header-anchor">Choose an IDE</a></h2>
+<p>There&#39;s a variety of good IDEs to work with Julia. You may have them already. Some don&#39;t even need a separate installation.</p>
+<p>The choice depends on personal taste, fashion trends, whether you mostly work locally or on a server, your mood, and the weather.</p>
+<p>Options include:</p>
+<ul>
+<li><p>Code &#40;<a href="https://code.visualstudio.com/">Visual Studio</a> or its open source alternative <a href="https://vscodium.com/">Codium</a>&#41;</p>
+</li>
+<li><p>Vim / Neovim / LunarVim / Neovide, ...</p>
+</li>
+<li><p>Emacs, ...</p>
+</li>
+<li><p><a href="https://jupyter.org/">Jupyter</a> / JupyterLab</p>
+</li>
+<li><p><a href="https://github.com/fonsp/Pluto.jl">Pluto</a> &#40;this one is actually a package within Julia&#41;</p>
+</li>
+</ul>
+<p>In the tutorial I&#39;m probably going to show you Code and Pluto.</p>
+<p>There&#39;s also the options of working directly from the REPL, and the Julia Package <a href="https://kristofferc.github.io/OhMyREPL.jl/latest/"><code>OhMyREPL</code></a> makes that experience much nicer.</p>
+<h2 id="using"><a href="#using" class="header-anchor">using</a></h2>
+<p>Julia syntax is similar to that of <code>Matlab</code>, indexing of arrays &#40;by default&#41; starts at 1, to load libraries you call them as <code>using LibraryName</code>.</p>
+<h2 id="work_in_environments"><a href="#work_in_environments" class="header-anchor">Work in Environments</a></h2>
+<p>Always, always, always, work in a project-dedicated environment. Working in environments is</p>
+<ol>
+<li><p>EASY</p>
+</li>
+<li><p>REPRODUCIBLE</p>
+</li>
+</ol>
+<p>EASY: all it takes is having the following three lines at the start of your scripts</p>
+<pre><code class="language-julia">using Pkg
+Pkg.activate&#40;&quot;.&quot;&#41; # where . is the project directory
+Pkg.instantiate&#40;&#41; # installs required packages, at the right version</code></pre>
+<p>REPRODUCIBLE: that is given by Julia automagically creating two important files for every environment, <code>Manifest.toml</code> and <code>Project.toml</code>. They contain detailed information about every package you installed in certain environment, their version, their dependencies, ...</p>
+<p>More details in the official <a href="https://pkgdocs.julialang.org/v1/environments/">Pkg documentation</a>.</p>
+<p>&#40;we are going to look at this together&#41;</p>
+<h2 id="sysimages"><a href="#sysimages" class="header-anchor">SysImages</a></h2>
+<p>Loading libraries may take some time. This is due to the fact that the code in Julia is Just-In-Time compiled, and that requires some extra work. Similarly, the <em>Time-to-first-plot</em> can be perceveid as high: the first time you call a function, say <code>plot&#40;x,y&#41;</code>, that <em>method</em> &#40;function applied to certain types&#41; is going to be compiled: this ensure that the second time you call the same method, its execution is going to be much faster &#40;like, really, much faster, C like fast&#41;. More details <a href="https://julialang.org/blog/2021/01/precompile_tutorial/">here</a>. This <em>can</em> be mitigated  &#40;if you perceive that as a bottleneck in your workflow&#41;. The trick is to use the library <a href="https://julialang.github.io/PackageCompiler.jl/stable/"><code>PackageCompiler</code></a>, and we are going to show you an example together.</p>
+<script type="text/javascript" src="/2022_AusDM/libs/ansi_up.js" defer></script>
+
+<div id="copyright" class="docs-footer container grid-lg">
+<a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Giulio Dalla Riva
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    </div>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

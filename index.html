@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/2022_AusDM/assets/favicon.png">
+  <script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ["\\(", "\\)"]],
+      processEscapes: true,
+    }
+  };
+</script>
+
+<!-- This weird alignment is required by Franklin's parser. -->
+<script
+    async
+    src="/2022_AusDM/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js">
+</script>
+
+<style>
+@font-face {
+  src: url("/JuliaTutorialsTemplate//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff">
+}
+</style>
+
+<style>
+@font-face {
+  src: url("/JuliaTutorialsTemplate//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff">
+}
+</style>
+
+<style>
+@font-face {
+  src: url("/JuliaTutorialsTemplate//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff">
+}
+</style>
+
+  <link rel="stylesheet"
+  href="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/styles/github.min.css">
+
+<script
+  src="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/highlight.min.js">
+</script>
+
+<script
+  src="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/languages/julia.min.js">
+</script>
+
+<script
+  src="/2022_AusDM/assets/Highlight/cdn-release-11.5.0/build/languages/julia-repl.min.js">
+</script>
+
+<script>
+  hljs.configure({tabReplace: '    '});
+  hljs.highlightAll();
+</script>
+
+    <style>
+    @font-face {
+      font-family: JuliaMono-Regular;
+      src: url("/JuliaTutorialsTemplate//assets/JuliaMono/juliamono-0.044/webfonts/JuliaMono-Regular.woff2");
+    }
+    </style>
+
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre.min.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre-exp.min.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre-icons.min.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/spectre-overrides.css">
+  <link rel="stylesheet" href="/2022_AusDM/css/docs.min.css">
+
+  <title>Julia Tutorials Template - Aus DM 2022: Julia Tutorial</title>
+  <meta name="description" content="A template for building websites with Julia language content. Easily create Pluto notebooks and publish them online.">
+</head>
+<body>
+  <div class="docs-container off-canvas off-canvas-sidebar-show">
+  <div class="docs-navbar">
+    <a class="off-canvas-toggle btn btn-link btn-action" href="#sidebar"><i class="icon icon-menu"></i></a>
+    <div class="btns d-flex">
+      <a class="btn btn-primary ml-1" href="https://github.com/gvdr/2022_AusDM">GitHub</a>
+    </div>
+</div>
+
+<div id="sidebar" class="docs-sidebar off-canvas-sidebar">
+
+<div class="docs-brand">
+    <h5><a href="/2022_AusDM/">Julia 2022 AusDm</a></h5>
+</div>
+
+<div class="docs-nav">
+<div class="accordion-container">
+  <ul class="menu menu-nav">
+    <div class="menu-header">Basic Julia Usage</div>
+    <li class='menu-item '><a href='/2022_AusDM/getting-started/'>Getting started</a></li>
+    <br/>
+    <div class="menu-header">Julia Goodies</div>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/00_Fast_Intro/'>Very Quick Intro</a></li>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/01_Diff_Pluto/'>Differential Equations</a></li>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/02_neural_ode/'>Neural Differential Equations</a></li>
+    <li class='menu-item '><a href='/2022_AusDM/tutorials/03_ude_sparse/'>Universal Differential Equations</a></li>
+  </ul>
+</div>
+</div>
+</div>
+<a class="off-canvas-overlay" href="#close"></a>
+
+
+<div class="off-canvas-content">
+<div id="content" class="docs-content">
+<div class="container">
+<!-- Content appended here -->
+<div class="franklin-content">
+<p>WORK IN PROGRESS THIS SLIDES ARE NOT COMPLETE WORK IN PROGRESS</p>
+<h1 id="a_fast_and_furious_intro_to_julia_for_the_eager_scientist"><a href="#a_fast_and_furious_intro_to_julia_for_the_eager_scientist" class="header-anchor">A fast and furious intro to Julia for the eager scientist</a></h1>
+<p>by <strong>Giulio Valentino Dalla Riva</strong> and <strong>Thomas Li</strong>, both from the <em>School of Mathematics and Statistics</em>, of the <a href="https://www.canterbury.ac.nz">University of Canterbury</a>.</p>
+<p>It&#39;s going to be presented at the 2022 Australian Data Mining &amp; Analytics conference, in Parramatta. We acknowledge the Traditional Owners and Custodians of the land where we meet to train and learn. We acknowledge that our teaching, learning and research continues the teaching, learning and research that has occurred on these lands for tens of thousands of years. We acknowledge and pay our respect to the Elders past, present and emerging. We pay respect to the peoples of the Darug.</p>
+<h1 id="before_the_tutorial"><a href="#before_the_tutorial" class="header-anchor">BEFORE THE TUTORIAL</a></h1>
+<p>Please do install Julia, and maybe an IDE of your choice &#40;see the <a href="getting-started">getting started</a> notes&#41;.</p>
+<h1 id="plan"><a href="#plan" class="header-anchor">Plan</a></h1>
+<p>We are going to run a lot. The aim is to show you that <a href="https://www.julialang.org">Julia</a> is already a mature and exciting alternative to other languages. One feature we&#39;d like to highlight is the advanced interoperability between the various packages in Julia&#39;s ecosystem.</p>
+<p>We assume that you know how to code, and you are all experts in various areas of ML, analytics, AI, ... So, we may skip some details here and there.</p>
+<p>First, we&#39;ll touch upon how to <a href="getting-started">get started with Julia</a> &#40;installation, REPL, IO of data&#41; and then get into some more exciting things &#40;working through different IDEs too&#33;&#41;.</p>
+<ol>
+<li><p>We begin with a super quick and dirty <a href="tutorials/00_Fast_Intro">intro to writing Julia code</a></p>
+</li>
+<li><p>We start with &quot;simple&quot; <a href="tutorials/01_Diff_Pluto">Differential Equations</a>.</p>
+</li>
+<li><p>And, as we are at it, consider <a href="https://github.com/gvdr/2022_AusDM/tree/main/Graphs">Geometric Deep Learning</a>.</p>
+</li>
+<li><p>We move on to combining <a href="tutorials/02_neural_ode">Neural Networks and Differential Equations</a>.</p>
+</li>
+<li><p>And, hoping to have the time for it, move to <a href="tutorials/03_ude_sparse">Universal Differential Equations</a>.</p>
+</li>
+</ol>
+<script type="text/javascript" src="/2022_AusDM/libs/ansi_up.js" defer></script>
+
+<div id="copyright" class="docs-footer container grid-lg">
+<a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Giulio Dalla Riva
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    </div>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>
