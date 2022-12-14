@@ -157,7 +157,7 @@ end
 # ╔═╡ 840f485d-3447-4dfe-a1c2-f606627699a9
 begin
 	optprob2 = Optimization.OptimizationProblem(optf, res1.minimizer)
-	res2 = Optimization.solve(optprob2, Optim.BFGS(initial_stepnorm=0.01), maxiters = 10000)
+	res2 = Optimization.solve(optprob2, Optim.BFGS(initial_stepnorm=0.01), maxiters = 200)
 end
 
 # ╔═╡ 07682dfd-2da6-4953-9056-1605a53f6390
@@ -171,7 +171,7 @@ end
 
 # ╔═╡ 0dc53e2a-34ba-4d1a-b232-042c56383dde
 md"""
-What a fit eh!
+Here we had to strongly limit the number of training iterations, as the model is running on Github Actions, and we don't want to have it cut midway through. But still, not bad of a fit eh!
 
 ## Equation discovery
 """
